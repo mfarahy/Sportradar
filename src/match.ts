@@ -35,7 +35,7 @@ export default class Match extends EventEmitter {
 
   public finish(): ValueResult<CompletedMatchResult> {
     if (this._status != MatchStates.Started) {
-      return Result.Fail('A not started match is not able to get end!');
+      return Result.FailValue('A not started match is not able to get end!');
     }
 
     this._endTime = new Date();
@@ -46,7 +46,7 @@ export default class Match extends EventEmitter {
       this.awayTeam,
       this._homeTeamScore,
       this._awayTeamScore,
-      duration.asSeconds()
+      duration.asMilliseconds()
     );
 
     this._status = MatchStates.Ended;
@@ -58,7 +58,7 @@ export default class Match extends EventEmitter {
 
   public cancel(reason: CancelationReasons, note: string): ValueResult<CanceledMatchResult> {
     if (this._status != MatchStates.Started) {
-      return Result.Fail('A not started match is not able to get canceled!');
+      return Result.FailValue('A not started match is not able to get canceled!');
     }
 
     var result = new CanceledMatchResult(this.homeTeam, this.awayTeam, reason, note);

@@ -22,7 +22,7 @@ export class CompletedMatchResult extends MatchResult {
     awayTeam: Team,
     public readonly homeTeamScore: number,
     public readonly awayTeamScore: number,
-    public readonly durationSeconds: number
+    public readonly duration: number
   ) {
     super(homeTeam, awayTeam);
   }

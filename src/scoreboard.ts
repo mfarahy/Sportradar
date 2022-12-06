@@ -16,19 +16,19 @@ export default class Scoreboard {
 
   public create(homeTeam: Team, awayTeam: Team): ValueResult<Match> {
     if (homeTeam == null) {
-      return Result.Fail('Home team is null!');
+      return Result.FailValue('Home team is null!');
     }
     if (awayTeam == null) {
-      return Result.Fail('Away team is null!');
+      return Result.FailValue('Away team is null!');
     }
     if (this._onlineMatches.find((x) => x.isParticipated(homeTeam))) {
-      return Result.Fail(`Currently ${homeTeam} is playing!`);
+      return Result.FailValue(`Currently ${homeTeam} is playing!`);
     }
     if (this._onlineMatches.find((x) => x.isParticipated(awayTeam))) {
-      return Result.Fail(`Currently ${awayTeam} is playing!`);
+      return Result.FailValue(`Currently ${awayTeam} is playing!`);
     }
     if (homeTeam.Equals(awayTeam)) {
-      return Result.Fail(`A team can not play with itself!`);
+      return Result.FailValue(`A team can not play with itself!`);
     }
 
     var match = new Match(homeTeam, awayTeam);
@@ -42,12 +42,12 @@ export default class Scoreboard {
 
     var startResult = match.start();
     if (!startResult.isSuccess) {
-      return startResult;
+      return Result.FailValue(startResult.message);
     }
 
     var updateResult = match.updateScore(0, 0);
     if (!updateResult.isSuccess) {
-      return updateResult;
+      return Result.FailValue(updateResult.message);
     }
 
     this._onlineMatches.push(match);

@@ -9,8 +9,22 @@ export class Result {
     return new SuccessValueResult(value);
   }
 
+  public static FailValue<T>(error: string): ErrorValueResult<T> {
+    return new ErrorValueResult(error);
+  }
+
   public static Fail(error: string): ErrorResult {
     return new ErrorResult(error);
+  }
+}
+
+export abstract class ValueResult<T> extends Result {
+  constructor(
+    public readonly value: T | undefined,
+    public readonly isSuccess: boolean,
+    public readonly message: string
+  ) {
+    super(isSuccess, message);
   }
 }
 
@@ -20,9 +34,9 @@ export class SuccessResult extends Result {
   }
 }
 
-export class SuccessValueResult<T> extends SuccessResult {
-  constructor(public readonly value: T) {
-    super();
+export class SuccessValueResult<T> extends ValueResult<T> {
+  constructor(value: T) {
+    super(value, true, '');
   }
 }
 
@@ -32,4 +46,8 @@ export class ErrorResult extends Result {
   }
 }
 
-export type ValueResult<T> = SuccessValueResult<T> | ErrorResult;
+export class ErrorValueResult<T> extends ValueResult<T> {
+  constructor(error: string) {
+    super(undefined, false, error);
+  }
+}
