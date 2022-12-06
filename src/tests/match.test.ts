@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { CancelationReasons } from '../cancelationReasons';
 import Match from '../match';
 import { MatchStates } from '../matchStates';
@@ -64,5 +65,48 @@ describe('testing Match', () => {
     expect(cancel.value?.cancelationReason).toBe(CancelationReasons.NaturalDisaster);
     expect(secondCancel.isSuccess).toBe(false);
     expect(cancelBeforeStart.isSuccess).toBe(false);
+  });
+
+  it('update should work fine', () => {
+    const match = new Match(new Team({ id: 1, name: 'team1' }), new Team({ id: 2, name: 'team2' }));
+    var wasCalled = false;
+    match.on('scoreUpdated', () => {
+      wasCalled = true;
+    });
+
+    var updateBeforeStart = match.updateScore(1, 1);
+
+    var startResult = match.start();
+
+    var secondUpdate = match.updateScore(2, 3);
+
+    var thirdUpdate = match.updateScore(2, 3);
+
+    var invalid_updates = [
+      match.updateScore(-2, 3),
+      match.updateScore(2, -3),
+      match.updateScore(1, 3),
+      match.updateScore(2, 2),
+    ];
+
+    match.finish();
+
+    var fourthUpdate = match.updateScore(4, 5);
+
+    var lastUpdate = moment(match.lastUpdate);
+    var startTime = moment(match.startTime);
+
+    expect(startResult.isSuccess).toBe(true);
+    expect(wasCalled).toBe(true);
+    expect(secondUpdate.isSuccess).toBe(true);
+    expect(thirdUpdate.isSuccess).toBe(true);
+    expect(match.homeTeamScore).toBe(2);
+    expect(match.awayTeamScore).toBe(3);
+    expect(lastUpdate.diff(startTime)).toBeGreaterThanOrEqual(0);
+    expect(updateBeforeStart.isSuccess).toBe(false);
+    expect(fourthUpdate.isSuccess).toBe(false);
+    expect(invalid_updates).toEqual(
+      expect.arrayContaining(expect.objectContaining({ isSuccess: false }))
+    );
   });
 });
