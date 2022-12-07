@@ -1,4 +1,4 @@
-# Sportadar Code Challenge
+# Sportradar Code Challenge
 
 Please use the below command to run tests:
 
