@@ -66,7 +66,7 @@ export default class Scoreboard {
           ? y.startTime != undefined && x.startTime != undefined && x.startTime < y.startTime
             ? 1
             : -1
-          : x.totalScore - y.totalScore;
+          : y.totalScore - x.totalScore;
       })
     );
   }

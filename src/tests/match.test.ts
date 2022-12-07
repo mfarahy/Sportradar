@@ -2,14 +2,15 @@ import moment from 'moment';
 import { CancelationReasons } from '../cancelationReasons';
 import Match from '../match';
 import { MatchStates } from '../matchStates';
+import { Result } from '../result';
 import Team from '../team';
 
 describe('testing Match', () => {
   it('start should run once', () => {
     const match = new Match(new Team({ id: 1, name: 'team1' }), new Team({ id: 2, name: 'team2' }));
 
-    var firstResult = match.start();
-    var secondResult = match.start();
+    const firstResult = match.start();
+    const secondResult = match.start();
 
     expect(firstResult.isSuccess).toBe(true);
     expect(secondResult.isSuccess).toBe(false);
@@ -25,13 +26,13 @@ describe('testing Match', () => {
       wasCalled = true;
     });
 
-    var finishBeforeStart = match.finish();
+    const finishBeforeStart = match.finish();
 
-    var startResult = match.start();
+    const startResult = match.start();
 
-    var finish = match.finish();
+    const finish = match.finish();
 
-    var secondFinish = match.finish();
+    const secondFinish = match.finish();
 
     expect(startResult.isSuccess).toBe(true);
     expect(wasCalled).toBe(true);
@@ -50,13 +51,13 @@ describe('testing Match', () => {
       wasCalled = true;
     });
 
-    var cancelBeforeStart = match.cancel(CancelationReasons.NaturalDisaster, STORM);
+    const cancelBeforeStart = match.cancel(CancelationReasons.NaturalDisaster, STORM);
 
-    var startResult = match.start();
+    const startResult = match.start();
 
-    var cancel = match.cancel(CancelationReasons.NaturalDisaster, STORM);
+    const cancel = match.cancel(CancelationReasons.NaturalDisaster, STORM);
 
-    var secondCancel = match.cancel(CancelationReasons.NaturalDisaster, STORM);
+    const secondCancel = match.cancel(CancelationReasons.NaturalDisaster, STORM);
 
     expect(startResult.isSuccess).toBe(true);
     expect(wasCalled).toBe(true);
@@ -74,15 +75,15 @@ describe('testing Match', () => {
       wasCalled = true;
     });
 
-    var updateBeforeStart = match.updateScore(1, 1);
+    const updateBeforeStart = match.updateScore(1, 1);
 
-    var startResult = match.start();
+    const startResult = match.start();
 
-    var secondUpdate = match.updateScore(2, 3);
+    const secondUpdate = match.updateScore(2, 3);
 
-    var thirdUpdate = match.updateScore(2, 3);
+    const thirdUpdate = match.updateScore(2, 3);
 
-    var invalid_updates = [
+    const invalid_updates: Result[] = [
       match.updateScore(-2, 3),
       match.updateScore(2, -3),
       match.updateScore(1, 3),
@@ -91,10 +92,10 @@ describe('testing Match', () => {
 
     match.finish();
 
-    var fourthUpdate = match.updateScore(4, 5);
+    const fourthUpdate = match.updateScore(4, 5);
 
-    var lastUpdate = moment(match.lastUpdate);
-    var startTime = moment(match.startTime);
+    const lastUpdate = moment(match.lastUpdate);
+    const startTime = moment(match.startTime);
 
     expect(startResult.isSuccess).toBe(true);
     expect(wasCalled).toBe(true);
@@ -106,7 +107,7 @@ describe('testing Match', () => {
     expect(updateBeforeStart.isSuccess).toBe(false);
     expect(fourthUpdate.isSuccess).toBe(false);
     expect(invalid_updates).toEqual(
-      expect.arrayContaining(expect.objectContaining({ isSuccess: false }))
+      expect.arrayContaining([expect.objectContaining({ isSuccess: false })])
     );
   });
 });

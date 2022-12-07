@@ -71,7 +71,7 @@ export default class Match extends EventEmitter {
     return Result.SuccessValue(result);
   }
 
-  public updateScore(_homeTeamScore: number, _awayTeamScore: number) {
+  public updateScore(_homeTeamScore: number, _awayTeamScore: number): Result {
     if (
       _homeTeamScore < 0 ||
       _homeTeamScore < this._homeTeamScore ||
