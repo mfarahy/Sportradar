@@ -1,10 +1,11 @@
-import Match from './match';
+import { Match } from './match';
+import IMatchBuilder from './matchBuilder';
 import { Result, ValueResult } from './result';
 import ScoreboardSummary from './scoreboardSummary';
 import Team from './team';
 
 export default class Scoreboard {
-  public constructor() {
+  public constructor(private readonly matchBuilder: IMatchBuilder) {
     this._onlineMatches = [];
   }
 
@@ -31,7 +32,7 @@ export default class Scoreboard {
       return Result.FailValue(`A team can not play with itself!`);
     }
 
-    var match = new Match(homeTeam, awayTeam);
+    var match = this.matchBuilder.createMatch(homeTeam, awayTeam);
     var removeTheMatch = () => {
       var index = this._onlineMatches.indexOf(match);
       this._onlineMatches.splice(index, 1);

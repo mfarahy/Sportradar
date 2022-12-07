@@ -1,4 +1,4 @@
-import Match from './match';
+import { Match } from './match';
 
 export default class ScoreboardSummary {
   public constructor(public readonly matches: ReadonlyArray<Match>) {

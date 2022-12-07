@@ -6,7 +6,7 @@ import { CanceledMatchResult, CompletedMatchResult } from './matchResult';
 import moment from 'moment';
 import { CancelationReasons } from './cancelationReasons';
 
-export default class Match extends EventEmitter {
+export class Match extends EventEmitter {
   public constructor(public readonly homeTeam: Team, public readonly awayTeam: Team) {
     super();
 

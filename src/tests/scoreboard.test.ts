@@ -1,4 +1,6 @@
 import { CancelationReasons } from '../cancelationReasons';
+import { MatchBuilder } from '../matchBuilder';
+import { Result } from '../result';
 import Scoreboard from '../scoreboard';
 import Team from '../team';
 
@@ -7,8 +9,8 @@ describe('checking scoreboard class', () => {
     team2 = new Team({ id: 2, name: 'team2' }),
     team3 = new Team({ id: 3, name: 'team3' });
 
-  it('check create method', () => {
-    const scoreboard = new Scoreboard();
+  it('should create method', () => {
+    const scoreboard = new Scoreboard(new MatchBuilder());
 
     const sameTeam = scoreboard.create(team1, team1);
     const successCreation = scoreboard.create(team1, team2);
@@ -25,8 +27,8 @@ describe('checking scoreboard class', () => {
     expect(awayRepetitive.isSuccess).toBe(false);
   });
 
-  it('check finish match', () => {
-    const scoreboard = new Scoreboard();
+  it('should finish match', () => {
+    const scoreboard = new Scoreboard(new MatchBuilder());
 
     const creationResult = scoreboard.create(team1, team2);
     const match = creationResult.value!;
@@ -40,7 +42,7 @@ describe('checking scoreboard class', () => {
   });
 
   it('should cancel match', () => {
-    const scoreboard = new Scoreboard();
+    const scoreboard = new Scoreboard(new MatchBuilder());
 
     const creationResult = scoreboard.create(team1, team2);
     const match = creationResult.value!;
@@ -54,7 +56,7 @@ describe('checking scoreboard class', () => {
   });
 
   it('should return correct summary', () => {
-    const scoreboard = new Scoreboard();
+    const scoreboard = new Scoreboard(new MatchBuilder());
 
     var MexicoCanada = scoreboard.create(
       new Team({ id: 1, name: 'Mexico' }),
@@ -94,5 +96,64 @@ describe('checking scoreboard class', () => {
     expect(summaryArray[2]).toBe(MexicoCanada.value);
     expect(summaryArray[3]).toBe(ArgentinaAustralia.value);
     expect(summaryArray[4]).toBe(GermanyFrance.value);
+  });
+
+  it('should return correct message if cannot create match', () => {
+    const scoreboard = new Scoreboard({
+      createMatch: jest.fn().mockReturnValue({
+        start: jest.fn().mockReturnValue(Result.Fail('ERROR-MESSAGE')),
+        on: jest.fn(),
+      }),
+    });
+    scoreboard;
+
+    var createResult = scoreboard.create(team1, team2);
+
+    expect(createResult).toEqual(
+      expect.objectContaining({
+        isSuccess: false,
+        message: 'ERROR-MESSAGE',
+      })
+    );
+  });
+
+  it('should return correct message if cannot create update score', () => {
+    const scoreboard = new Scoreboard({
+      createMatch: jest.fn().mockReturnValue({
+        start: jest.fn().mockReturnValue({ isSuccess: true }),
+        updateScore: jest.fn().mockReturnValue(Result.Fail('ERROR-MESSAGE')),
+        on: jest.fn(),
+      }),
+    });
+    scoreboard;
+
+    var createResult = scoreboard.create(team1, team2);
+
+    expect(createResult).toEqual(
+      expect.objectContaining({
+        isSuccess: false,
+        message: 'ERROR-MESSAGE',
+      })
+    );
+  });
+
+  it('should clear board', () => {
+    const scoreboard = new Scoreboard(new MatchBuilder());
+
+    var mexicoCanada = scoreboard.create(
+      new Team({ id: 1, name: 'Mexico' }),
+      new Team({ id: 2, name: 'Canada' })
+    );
+
+    var spainBrazil = scoreboard.create(
+      new Team({ id: 3, name: 'Spain' }),
+      new Team({ id: 4, name: 'Brazil' })
+    );
+
+    scoreboard.clearBoard();
+
+    expect(mexicoCanada.isSuccess).toBe(true);
+    expect(spainBrazil.isSuccess).toBe(true);
+    expect(scoreboard.onlineMatches).toHaveLength(0);
   });
 });

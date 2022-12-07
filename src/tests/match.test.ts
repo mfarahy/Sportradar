@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { CancelationReasons } from '../cancelationReasons';
-import Match from '../match';
+import { Match } from '../match';
 import { MatchStates } from '../matchStates';
 import { Result } from '../result';
 import Team from '../team';
@@ -94,20 +94,42 @@ describe('testing Match', () => {
 
     const fourthUpdate = match.updateScore(4, 5);
 
-    const lastUpdate = moment(match.lastUpdate);
-    const startTime = moment(match.startTime);
-
     expect(startResult.isSuccess).toBe(true);
     expect(wasCalled).toBe(true);
     expect(secondUpdate.isSuccess).toBe(true);
     expect(thirdUpdate.isSuccess).toBe(true);
     expect(match.homeTeamScore).toBe(2);
     expect(match.awayTeamScore).toBe(3);
-    expect(lastUpdate.diff(startTime)).toBeGreaterThanOrEqual(0);
     expect(updateBeforeStart.isSuccess).toBe(false);
     expect(fourthUpdate.isSuccess).toBe(false);
     expect(invalid_updates).toEqual(
       expect.arrayContaining([expect.objectContaining({ isSuccess: false })])
     );
   });
+
+  it('should save finish time', async () => {
+    const match = new Match(new Team({ id: 1, name: 'team1' }), new Team({ id: 2, name: 'team2' }));
+
+    const startResult = match.start();
+
+    await sleep(1000);
+
+    match.finish();
+
+    const endTime = moment(match.endTime);
+    const startTime = moment(match.startTime);
+
+    expect(startResult.isSuccess).toBe(true);
+    expect(endTime.diff(startTime)).toBeGreaterThanOrEqual(1000);
+  });
+
+  function sleep(ms: number): Promise<void> {
+    return new Promise<void>(
+      (resolve: (value: void | PromiseLike<void>) => void, reject: (reason?: any) => void) => {
+        setTimeout(() => {
+          resolve();
+        }, ms);
+      }
+    );
+  }
 });
